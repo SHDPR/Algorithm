@@ -17,7 +17,4 @@ int main(){
   else{
     cout << loop + 1 - X + sum << "/" << X - sum << endl;
   }
-
-
-
 }
