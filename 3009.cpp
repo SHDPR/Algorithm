@@ -11,7 +11,6 @@ int main(){
 
   for(int idx = 0; idx < 3; idx++){
     cin >> x >> y;
-
     iter = rect_x.find(x);
 
     if(rect_x.find(x) != rect_x.end())
