@@ -30,9 +30,7 @@ int main(){
 
     if(dist == 0 && r1 == r2){
       cout << -1 << endl;
-      return 0;
     }
-
     else if(r1 + r2 < dist){
       cout << 0 << endl;
     }
@@ -47,9 +45,6 @@ int main(){
     }
     else if(abs(r1 - r2) > dist){
       cout << 0 << endl;
-    }
-    else{
-      cout << 2 << endl;
     }
   }
 }
