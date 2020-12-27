@@ -9,7 +9,7 @@ int main(){
 
   for(int idx = 0; idx < T; idx++){
     cin >> A >> B;
-    cout << "Case #" << idx + 1 << ": " << A << "" + "" << B << " = "<< A + B << '\n';
+    cout << "Case #" << idx + 1 << ": " << A << " + " << B << " = "<< A + B << '\n';
   }
 
 }
