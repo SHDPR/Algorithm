@@ -6,8 +6,14 @@ using namespace std;
 int main(){
   int N = 0;
   cin >> N;
-
-  int cnt[N+1] = {0,};
+  /* If you declare array as int[N+1] form,
+     the maximum size you can run without error is 25000
+     In order not to get error for sizes over 25000,
+     implement through dynamic allocation */
+  int *cnt = (int*)malloc(sizeof(int) * (N+1));
+  for(int idx = 0; idx < N+1; idx++){
+    cnt[idx] = 0;
+  }
 
   for(int idx = 2; idx < N+1; idx++){
     cnt[idx] = 1 + cnt[idx-1];
@@ -17,7 +23,7 @@ int main(){
       cnt[idx] = min(cnt[idx], 1 + cnt[idx/2]);
   }
 
-  cout << cnt[N] <<sizeof(int);
+  cout << cnt[N];
 
 
 }

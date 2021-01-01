@@ -3,13 +3,9 @@
 #include <limits.h>
 using namespace std;
 
-int N;
-int diff = INT_MAX;
-int ability[20][20];
-int start[20] = {0, };
 
 
-int diff_value(){
+int diff_value(int** ability, int* start, int N){
   int sab = 0;
   int lab = 0;
 
@@ -26,16 +22,16 @@ int diff_value(){
 }
 
 
-void divide(int cnt, int idx){
+void divide(int cnt, int idx, int N, int** ability, int* start, int *diff){
   if(cnt == N/2){
-    diff = min(diff, diff_value());
+    *diff = min(*diff, diff_value(ability, start, N));
     return;
   }
 
   for(int i = idx; i < N; i++){
     if(start[i] == 0){
       start[i] = 1;
-      divide(cnt + 1, i + 1);
+      divide(cnt + 1, i + 1, N, ability, start, diff);
       start[i] = 0;
     }
   }
@@ -43,16 +39,22 @@ void divide(int cnt, int idx){
 }
 
 int main(){
-
+	int N = 0;
   cin >> N;
 
-  for(int idx = 0; idx < N; idx++){
-    for(int jdx = 0; jdx < N; jdx++){
-      cin >> ability[idx][jdx];
-    }
-  }
+	int **ability = (int**)malloc(sizeof(int*) * N);
+	int start[N] = {0,};
+	int diff = INT_MAX;
 
-  divide(0, 0);
+	for(int idx = 0; idx < N; idx++){
+		ability[idx] = (int*)malloc(sizeof(int) * N);
+		for(int jdx = 0; jdx < N; jdx++){
+			cin >> ability[idx][jdx];
+		}
+	}
+
+
+  divide(0, 0, N, ability, start, &diff);
 
   cout << diff << endl;
 }

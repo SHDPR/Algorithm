@@ -21,6 +21,6 @@ int main(){
     if(idx >= 2)
       score[idx] = max(score[idx], stair[idx] + score[idx-2]);
   }
-  for(int idx = 0; idx < n+1; idx++)
-  cout << score[idx] << " ";
+
+  cout << score[n];
 }

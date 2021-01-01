@@ -1,60 +1,27 @@
-#include <iostream>
-#include <cmath>
-#include <limits.h>
+#include <bits/stdc++.h>
+#define MOD 1000000000
+
 using namespace std;
 
+int a[2][12];
 
+int main() {
+    int n, ans = 9;
 
-int diff_value(int** ability, int* start, int N){
-  int sab = 0;
-  int lab = 0;
+    scanf("%d", &n);
 
-  for(int idx = 0; idx < N; idx++){
-    for(int jdx = 0; jdx < N; jdx++){
-      if(start[idx] == 1 && start[jdx] == 1 && idx != jdx)
-        sab += ability[idx][jdx];
-      if(start[idx] == 0 && start[jdx] == 0 && idx != jdx)
-        lab += ability[idx][jdx];
+    for(int i = 2; i < 11; i++)
+        a[1][i] = 1;
+
+    for(int i = 2; i <= n; i++) {
+        ans = 0;
+        for(int j = 1; j < 11; j++) {
+            a[i%2][j] = (a[(i-1)%2][j-1] + a[(i-1)%2][j+1]) % MOD;
+            ans = (ans + a[i%2][j]) % MOD;
+        }
     }
-  }
-  return abs(sab - lab);
 
-}
+    printf("%d", ans);
 
-
-void divide(int cnt, int idx, int N, int** ability, int* start, int *diff){
-  if(cnt == N/2){
-    *diff = min(*diff, diff_value(ability, start, N));
-    return;
-  }
-
-  for(int i = idx; i < N; i++){
-    if(start[i] == 0){
-      start[i] = 1;
-      divide(cnt + 1, i + 1, N, ability, start, diff);
-      start[i] = 0;
-    }
-  }
-
-}
-
-int main(){
-	int N = 0;
-  cin >> N;
-
-	int **ability = (int**)malloc(sizeof(int*) * N);
-	int start[N] = {0,};
-	int diff = INT_MAX;
-
-	for(int idx = 0; idx < N; idx++){
-		ability[idx] = (int*)malloc(sizeof(int) * N);
-		for(int jdx = 0; jdx < N; jdx++){
-			cin >> ability[idx][jdx];
-		}
-	}
-
-
-  divide(0, 0, N, ability, start, &diff);
-
-  cout << diff << endl;
+    return 0;
 }
