@@ -1,36 +1,41 @@
 #include <iostream>
+#define DIV 1000000000;
 using namespace std;
 
-#define DIV 1000000000;
 
 int main(){
+
+  int stair[2][10];
+
+  for(int idx = 0; idx < 10; idx++){
+    if(idx == 0)
+      stair[0][idx] = 0;
+    else
+      stair[0][idx] = 1;
+  }
+  int sum = 0;
   int N = 0;
   cin >> N;
+  if(!(N >= 1 && N <= 100))
+    throw out_of_range("N value out of range");
 
-  int stair[N+1][10] = {{0,0,0,0,0,0,0,0,0,0}, };
-
-  for(int idx = 1; idx < N+1; idx++){
-    for(int jdx = 0; jdx < 10; jdx++){
-      if(idx == 1){
-        if(jdx == 0) stair[idx][jdx] = 0;
-        else         stair[idx][jdx] = 1;
-      }
-      else{
-        if(jdx != 0 && jdx != 9)
-          stair[idx][jdx] = stair[idx-1][jdx-1] + stair[idx-1][jdx+1];
-        else if(jdx == 0)
-          stair[idx][jdx] = stair[idx-1][jdx+1];
-        else
-          stair[idx][jdx] = stair[idx-1][jdx-1];
-      }
+  for(int ndx = 2; ndx <= N; ndx++){
+    for(int idx = 0; idx < 10; idx++){
+      int next = (ndx + 1)%2;
+      int prev = ndx % 2;
+      if(idx == 0)  stair[next][idx] = stair[prev][idx+1];
+      else if(idx == 9)  stair[next][idx] = stair[prev][idx-1];
+      else  stair[next][idx] = (stair[prev][idx+1] + stair[prev][idx-1]) % DIV;
     }
   }
 
-  int sum = 0;
   for(int idx = 0; idx < 10; idx++){
-    sum += stair[N][idx];
+    sum = (sum + stair[(N + 1) % 2][idx]) % DIV;
   }
 
-  cout << sum;
+  cout << sum << endl;
+
+
+
 
 }
