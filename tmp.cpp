@@ -1,27 +1,39 @@
-#include <bits/stdc++.h>
-#define MOD 1000000000
+//c++
+
+#include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-int a[2][12];
+typedef struct {
+	int first;
+	int second;
+}st;
+
+int dp[102];
+st line[102];
+
+bool compare(st a, st b) {
+	return a.first < b.first;
+}
 
 int main() {
-    int n, ans = 9;
-
-    scanf("%d", &n);
-
-    for(int i = 2; i < 11; i++)
-        a[1][i] = 1;
-
-    for(int i = 2; i <= n; i++) {
-        ans = 0;
-        for(int j = 1; j < 11; j++) {
-            a[i%2][j] = (a[(i-1)%2][j-1] + a[(i-1)%2][j+1]) % MOD;
-            ans = (ans + a[i%2][j]) % MOD;
-        }
-    }
-
-    printf("%d", ans);
-
-    return 0;
+	int n;
+	int result = 0;
+	cin >> n;
+	for (int i = 1; i <= n; i++) {
+		cin >> line[i].first >> line[i].second;
+	}
+	sort(line, line + n + 1, compare);
+	for (int i = 1; i <= n; i++) {
+		for (int j = 0; j < i; j++) {
+			if (line[i].second > line[j].second) {
+				if (dp[j] >= dp[i]) {
+					dp[i] = dp[j] + 1;
+				}
+			}
+		}
+		result = max(result, dp[i]);
+	}
+	cout << n - result;
 }
