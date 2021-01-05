@@ -20,6 +20,4 @@ int main(){
   }
 
   cout << cnt;
-
-
 }
