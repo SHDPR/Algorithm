@@ -17,7 +17,7 @@ int main(){
 
   for(long long idx = 0; idx < N-1; idx++)
     cin >> dist[idx];
-
+``
 
   for(long long idx = 0; idx < N; idx++){
     cin >> city[idx].first;
