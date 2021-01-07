@@ -44,9 +44,9 @@ int vps(char input[]){
 
 
 int main(){
-  char input[100];
+  char input[1000];
   while(true){
-    cin.getline(input, 100);
+    cin.getline(input, 1000);
     if(strcmp(input, ".") == 0)
       exit(0);
 
