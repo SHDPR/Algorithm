@@ -3,7 +3,6 @@
 #include <string.h>
 
 using namespace std;
-#define MAXSIZE 10000;
 
 class Stack{
   private :
