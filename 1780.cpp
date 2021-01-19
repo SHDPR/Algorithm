@@ -58,7 +58,7 @@ int main(){
   }
 
   divconq(color, 0, 0, len, &w_cnt, &b_cnt, &c_cnt);
-  cout << c_cnt << '\n' << b_cnt << '\n' << w_cnt;
+  cout << c_cnt << '\n' << w_cnt << '\n' << b_cnt;
 
 
 }

@@ -17,9 +17,6 @@ long long divconq(long long target, long long pow, long long div){
 }
 
 
-
-
-
 int main(){
   long long A, B, C;
   cin >> A >> B >> C;

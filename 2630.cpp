@@ -35,9 +35,6 @@ void divconq(int **color, int idx, int jdx, int len, int *w_cnt, int *b_cnt){
 }
 
 
-
-
-
 int main(){
   int len = 0;
   int w_cnt = 0;
