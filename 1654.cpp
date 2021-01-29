@@ -1,48 +1,46 @@
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 
+typedef long long ll;
+
+ll compute_lines(ll lines[], ll len, int size){
+  ll cnt = 0;
+  for(int idx = 0; idx < size; idx++)
+    cnt += (lines[idx] / len);
+  return cnt;
+}
 
 
-int lan_search(int lan[], int size, int target, int start, int end){
-  int mid;
-  int cnt = 0;
+ll binary_lines(ll lines[], int size, ll start, ll end, int target, ll max){
+  ll mid = (start + end) / 2;
+  ll cnt = compute_lines(lines, mid, size);
 
-  while(end > start){
-    mid = (start + end) / 2;
-    for(int idx = 0; idx < size; idx++)
-      cnt+= lan[idx] / mid;
-
-    if(cnt > target)
-      end = mid;
-    else
-      start = mid + 1;
+  if(cnt >= target){
+    max = (mid > max)? mid : max;
+    if(start >= end)
+      return max;
+    return binary_lines(lines, size, mid + 1, end, target, max);
   }
-  return end;
+  else
+    return binary_lines(lines, size, start, mid - 1, target, max);
 }
 
 
 
-
 int main(){
+  // K -> Num of Input, N -> Num of Output
   int K, N;
+  ll *lines;
+  ll max_line = 0;
   cin >> K >> N;
-  int lan[K];
-
-  int max = 0;
+  lines = (ll*) malloc(sizeof(ll) * K);
 
   for(int idx = 0; idx < K; idx++){
-    cin >> lan[idx];
-    max = (lan[idx] > max)? lan[idx] : max;
+    cin >> lines[idx];
+    max_line = (max_line > lines[idx])? max_line : lines[idx];
   }
 
-
-  cout << lan_search(lan, K, N, 1, max);
-
-
-
-
-
+  cout << binary_lines(lines, K, 1, max_line, N, 0);
 
 }
