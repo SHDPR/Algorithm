@@ -1,5 +1,5 @@
 #include <iostream>
-#include <algorithm>
+#include <queue>
 
 using namespace std;
 #define MAX_ELEMENT 100000
@@ -65,19 +65,33 @@ int main()
 {
   cin.tie(NULL);
   ios::sync_with_stdio(false);
+
   int op_count = 0;
   int op = 0;
   cin >> op_count;
 
-  Maxheap heap(op_count);
+  priority_queue<int> max_heap;
+  //Maxheap heap(op_count);
 
 
   for(int idx = 0; idx < op_count; idx++)
   {
       cin >> op;
       if(op == 0)
-        cout << heap.remove() << '\n';
-      else
-        heap.insert(op);
-  }
+      {
+        //cout << heap.remove() << '\n';
+        if(max_heap.size() == 0)
+          cout << 0 << '\n';
+        else
+        {
+          cout << max_heap.top() << '\n';
+          max_heap.pop();  
+        }
+      }
+        else
+        {
+          //heap.insert(op);
+          max_heap.push(op);
+        }
+    }
 }
