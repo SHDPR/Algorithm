@@ -80,7 +80,13 @@ static tid_t allocate_tid (void);
 
 
 /* Modification_Project 1 */
+fixed_point load_avg;           /* Load average value for MLFQS */
+void insert_sleeplist(void);
 bool thread_cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
+void thread_donate_priority(struct thread *target, int donate_priority);
+void inc_recent_cpu(void);
+void update_load_avg_recent_cpu(void);
+void update_priority(struct thread *t);
 /* Modification_Project 1 */
 
 
@@ -134,6 +140,10 @@ thread_start (void)
 
   /* Wait for the idle thread to initialize idle_thread. */
   sema_down (&idle_started);
+
+  /* Modification_Project 1 */
+  load_avg = FP_CONV(0);
+  /* Modification_Project 1 */
 }
 
 /* Called by the timer interrupt handler at each timer tick.
@@ -155,17 +165,18 @@ thread_tick (void)
 
   /* Modification_Project 1 */
   struct list_elem *iter;
-  int64_t current_tick = timer_ticks();                            // Gets the current tick information
+  /* Get the current tick info */
+  int64_t current_tick = timer_ticks();
+  /* If sleep time is past, remove and unblock the thread */
   for(iter = list_begin(&sleep_list); iter != list_end(&sleep_list);)
   {
-    struct thread *t = list_entry(iter, struct thread, elem);       // Converts from a struct list_elem back to struct thread
+    struct thread *t = list_entry(iter, struct thread, elem);
     iter = list_next(iter);
 
-    if(t->sleep_ticks <= current_tick)                              // If sleep time is past,
-    {
+    if(t->sleep_ticks <= current_tick){
       t->sleep_ticks = 0;
-      list_remove(&t->elem);                                       // Remove the thread from the sleep_list
-      thread_unblock(t);                                           // Unblock the thread
+      list_remove(&t->elem);
+      thread_unblock(t);
     }
   }
   /* Modification_Project 1 */
@@ -294,6 +305,14 @@ thread_unblock (struct thread *t)
   /* Modification_Project 1 */
 
   t->status = THREAD_READY;
+
+  /* Modification_Project 1 */
+
+  //if (!thread_mlfqs && thread_current() != idle_thread && thread_current()->priority < t->priority)
+  //  thread_yield();
+
+  /* Modification_Project 1 */
+
   intr_set_level (old_level);
 }
 
@@ -340,6 +359,17 @@ thread_exit (void)
 #ifdef USERPROG
   process_exit ();
 #endif
+  /* Modification_Project 1 */
+  struct thread *current = thread_current();
+
+  struct list_elem *iter;
+  /* Release all locks this thread is holding before destroying this thread */
+  for(iter = list_begin(&current->locks); iter != list_end(&current->locks); iter = list_next(iter))
+  {
+    struct lock *lock_holding = list_entry(iter, struct lock, lock_elem);
+    lock_release(lock_holding);
+  }
+  /* Modification_Project 1 */
 
   /* Remove thread from all threads list, set our status to dying,
      and schedule another process.  That process will destroy us
@@ -397,10 +427,32 @@ thread_foreach (thread_action_func *func, void *aux)
 void
 thread_set_priority (int new_priority)
 {
-  thread_current ()->priority = new_priority;
   /* Modification_Project 1 */
-  /* If priority changes are done, execution order may be re-ordered */
-  thread_yield();
+  enum intr_level old_level = intr_disable();
+
+  struct thread *current = thread_current();
+  /* If the current thread has donated priority,
+     property change request is done normally */
+  if(current->priority == current->original_priority)
+  {
+    current->priority = new_priority;
+    current->original_priority = new_priority;
+  }
+  /* If the current thread has donated priority,
+     property change request is postponed til lock release */
+  else
+    current->original_priority = new_priority;
+
+  /* As the changed priority may affect scheduling,
+     check the highest-priority-thread waiting and yield if so */
+  if(!list_empty(&ready_list))
+  {
+    struct thread *ready = list_entry(list_begin(&ready_list), struct thread, elem);
+    if(ready != NULL && ready->priority > current->priority)
+      thread_yield();
+  }
+
+  intr_set_level(old_level);
   /* Modification_Project 1 */
 }
 
@@ -415,33 +467,42 @@ thread_get_priority (void)
 void
 thread_set_nice (int nice UNUSED)
 {
-  /* Not yet implemented. */
+  enum intr_level old_level = intr_disable();
+
+  struct thread *current = thread_current();
+  current->nice = nice;
+  update_priority(current);
+
+  if(!list_empty(&ready_list) && current != idle_thread)
+  {
+    struct thread *ready = list_entry(list_begin(&ready_list), struct thread, elem);
+    if(ready != NULL && ready->priority > current->priority)
+      thread_yield();
+  }
+  intr_set_level(old_level);
 }
 
 /* Returns the current thread's nice value. */
 int
 thread_get_nice (void)
 {
-  /* Not yet implemented. */
-  return 0;
+  return thread_current()->nice;
 }
 
 /* Returns 100 times the system load average. */
 int
 thread_get_load_avg (void)
 {
-  /* Not yet implemented. */
-  return 0;
+  return INT_ROUND(FP_MUL_MIX(load_avg, 100));
 }
 
 /* Returns 100 times the current thread's recent_cpu value. */
 int
 thread_get_recent_cpu (void)
 {
-  /* Not yet implemented. */
-  return 0;
+  return INT_ROUND(FP_MUL_MIX(thread_current()->recent_cpu, 100));
 }
-
+
 /* Idle thread.  Executes when no other thread is ready to run.
 
    The idle thread is initially put on the ready list by
@@ -529,6 +590,11 @@ init_thread (struct thread *t, const char *name, int priority)
   t->magic = THREAD_MAGIC;
   /* Modification_Project 1 */
   t->sleep_ticks = 0;
+  t->original_priority = priority;
+  t->waiting = NULL;
+  list_init(&t->locks);
+  t->nice = 0;
+  t->recent_cpu = FP_CONV(0);
   /* Modification_Project 1 */
   list_push_back (&all_list, &t->allelem);
 }
@@ -649,7 +715,7 @@ allocate_tid (void)
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 
 
-  /* Modification_Project 1 */
+/* Modification_Project 1 */
 
 /* Inserts the current thread into the back of the sleep_list */
 void insert_sleeplist(void)
@@ -669,4 +735,82 @@ bool thread_cmp_priority(const struct list_elem *a, const struct list_elem *b, v
   return thread_a->priority > thread_b->priority;
 }
 
-  /* Modification_Project 1 */
+/* Donates the priority to the target thread */
+void thread_donate_priority(struct thread *target, int donate_priority)
+{
+  enum intr_level old_level = intr_disable();
+
+  target-> priority = donate_priority;
+
+  if(target->status == THREAD_READY)
+  {
+    list_remove(&target->elem);
+    list_insert_ordered(&ready_list, &target->elem, thread_cmp_priority, NULL);
+  }
+
+  if(target == thread_current() && !list_empty(&ready_list))
+  {
+    struct thread *ready = list_entry(list_begin(&ready_list), struct thread, elem);
+    if(ready->priority > donate_priority)
+      thread_yield();
+  }
+
+  intr_set_level(old_level);
+}
+
+/* Increase recent_cpu value of runnig thread once per second */
+/* Called by timer_interrupt function */
+void inc_recent_cpu(void)
+{
+  ASSERT(thread_mlfqs);
+  ASSERT(intr_context());
+
+  struct thread *current = thread_current();
+
+  /* If not idle, increase recent_cpu value of current thread */
+  if(current != idle_thread)
+  {
+    current->recent_cpu = FP_ADD_MIX(current->recent_cpu, 1);
+  }
+}
+
+/* Update load_avg and recent_cpu value of all threads once per second */
+/* Called by timer_interrupt function */
+void update_load_avg_recent_cpu(void)
+{
+  ASSERT(thread_mlfqs);
+  ASSERT(intr_context());
+  /* Count number of ready threads */
+  size_t ready_threads = list_size(&ready_list);
+  /* Add currently running thread to the count */
+  ready_threads = (thread_current() == idle_thread)? ready_threads : ready_threads + 1;
+  /* Calculate load_avg value*/
+  load_avg = FP_ADD(FP_DIV_MIX(FP_MUL_MIX(load_avg, 59), 60), FP_DIV_MIX(FP_CONV(ready_threads), 60));
+
+  /* Update all threads' recent_cpu value */
+  struct list_elem *iter;
+  for(iter = list_begin(&all_list); iter != list_end(&all_list); iter = list_next(iter))
+  {
+    struct thread *t = list_entry(iter, struct thread, allelem);
+    if(t != idle_thread)
+    {
+      t->recent_cpu = FP_ADD_MIX(FP_MUL(FP_DIV(FP_MUL_MIX (load_avg, 2), FP_ADD_MIX (FP_MUL_MIX (load_avg, 2), 1)), t->recent_cpu), t->nice);
+      update_priority(t);
+    }
+  }
+}
+
+/* Update mlfqs priority for argument thread*/
+void update_priority(struct thread *t)
+{
+  ASSERT(thread_mlfqs);
+  enum intr_level old_level = intr_disable();
+  /* Update priority value for argument thread */
+  if(t != idle_thread)
+  {
+    t->priority = INT_CONV(FP_SUB_MIX(FP_SUB(FP_CONV(PRI_MAX), FP_DIV_MIX(t->recent_cpu, 4)), 2 * t->nice));
+    list_sort(&ready_list, thread_cmp_priority, NULL);
+  }
+  intr_set_level(old_level);
+}
+/* Modification_Project 1 */

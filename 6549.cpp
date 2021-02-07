@@ -69,8 +69,8 @@ int main(){
   int N = -1;
   while(1){
     cin >> N;
-    int height[N];
-    int segmnt[N * 2];
+    int *height = (int*)malloc(sizeof(int) * N);
+    int *segmnt = (int*)malloc(sizeof(int) * N * 4);
 
     if(N == 0) return 0;
 
@@ -81,5 +81,8 @@ int main(){
 
 
     cout << search(segmnt, height, 0, N-1, N) << '\n';
+
+    free(height);
+    free(segmnt);
   }
 }

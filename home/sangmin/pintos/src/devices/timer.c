@@ -94,9 +94,11 @@ timer_sleep (int64_t ticks)
   ASSERT (intr_get_level () == INTR_ON);
   /* Modification_Project 1 */
   enum intr_level old_level = intr_disable();
-  thread_current()->sleep_ticks = ticks + start;     // Saves the timing when the thread should be waked up
-  insert_sleeplist();                                // Inserts the current thread into the sleep_list
-  thread_block();                                    // Blocks the current thread
+  /* Save the time when the current thread should be woke up */
+  thread_current()->sleep_ticks = ticks + start;
+  /* Insert the current thread to sleep_list and blocks it */
+  insert_sleeplist();
+  thread_block();
   intr_set_level(old_level);
   /* Modification_Project 1 */
 }
@@ -177,6 +179,23 @@ timer_interrupt (struct intr_frame *args UNUSED)
 {
   ticks++;
   thread_tick ();
+
+  // If testing multi-level feedback queue scheduler... */
+  if(thread_mlfqs)
+  {
+    /* Increase recent_cpu by 1 for the running thread */
+    inc_recent_cpu();
+    /* load_avg and recent_cpu should be recaculated once per second */
+    if(ticks % TIMER_FREQ == 0)
+    {
+      update_load_avg_recent_cpu();
+    }
+    /* priority should be recalculated once every fourth clock tick */
+    else if(ticks % 4 == 0)
+    {
+      update_priority(thread_current());
+    }
+  }
 }
 
 /* Returns true if LOOPS iterations waits for more than one timer

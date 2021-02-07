@@ -5,6 +5,11 @@
 #include <list.h>
 #include <stdint.h>
 
+/* Modification_Project 1 */
+/* Fixed point arithmetic */
+#include "threads/fixed-point.h"
+/* Modification_Project 1 */
+
 /* States in a thread's life cycle. */
 enum thread_status
   {
@@ -95,6 +100,12 @@ struct thread
 
     /* Modification_Project 1 */
     int64_t sleep_ticks;                 /* Ticks to sleep */
+    int original_priority;               /* Original priority, before donation */
+    struct lock *waiting;                /* Lock on which this thread is waiting for (needed for nested donation) */
+    struct list locks;                   /* List of locks this thread is holding (needed for multiple donation)*/
+
+    int nice;                            /* Nice value for MLFQS */
+    fixed_point recent_cpu;              /* Recent_CPU value for MLFQS */
     /* Modification_Project 1 */
 
 
@@ -146,6 +157,7 @@ int thread_get_load_avg (void);
 /* Modification_Project 1 */
 void insert_sleeplist(void);
 bool thread_cmp_priority(const struct list_elem *a, const struct list_elem *b, void *aux UNUSED);
+void thread_donate_priority(struct thread *target, int donate_priority);
 /* Modification_Project 1 */
 
 
