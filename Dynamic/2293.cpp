@@ -5,41 +5,51 @@ using namespace std;
 int main()
 {
   int n, k;
-  int *coin;
-  int **knapsack;
   cin >> n >> k;
 
-  coin = (int*)malloc(sizeof(int) * (n + 1));
-  knapsack = (int**)malloc(sizeof(int*) * (n + 1));
+  int coin[n+1];
 
-  for(int idx = 0; idx < n + 1; idx++)
+  int knapsack[2][k+1];
+
+  for(int idx = 0; idx < 2; idx++)
   {
-    knapsack[idx] = (int*)malloc(sizeof(int) * (k + 1));
     for(int jdx = 0; jdx < k + 1; jdx++)
-    {
       knapsack[idx][jdx] = 0;
-    }
   }
 
-  //memset(knapsack, 0, sizeof(knapsack));
+  //memset(knapsack, 0, sizeof(int) * 2 * (k+1));
 
-  for(int idx = 1; idx < n + 1; idx++){
+  knapsack[0][0] = 1;
+  knapsack[1][0] = 1;
+
+
+  for(int idx = 1; idx < n + 1; idx++)
+  {
     cin >> coin[idx];
-    knapsack[idx][0] = 1;
   }
 
-  for(int idx = 1; idx < n + 1; idx++){
+  int toggle = 0;
+
+  for(int idx = 1; idx < n + 1; idx++)
+  {
+    toggle = (toggle + 1) % 2;
     for(int jdx = 1; jdx < k + 1; jdx++)
     {
       if(coin[idx] > jdx)
-        knapsack[idx][jdx] = knapsack[idx-1][jdx];
+      {
+        knapsack[toggle][jdx] = knapsack[(toggle + 1) % 2][jdx];
+      //  cout << knapsack[toggle][jdx] << " : " << "toggle-" << toggle << "idx-" << jdx << '\n';
+      }
+
       else
-        knapsack[idx][jdx] = knapsack[idx-1][jdx] + knapsack[idx][jdx - coin[idx]];
+      {
+        knapsack[toggle][jdx] = knapsack[(toggle + 1) % 2][jdx] + knapsack[toggle][jdx - coin[idx]];
+        //cout << knapsack[toggle][jdx] << " : " << "toggle-" << toggle << "idx-" << jdx << '\n';
+      }
+
     }
   }
 
-  cout << knapsack[n][k];
+  cout << knapsack[toggle][k];
 
-  free(knapsack);
-  free(coin);
 }
