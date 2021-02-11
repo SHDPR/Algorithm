@@ -11,13 +11,14 @@ int main()
 
   int knapsack[2][k+1];
 
+/*
   for(int idx = 0; idx < 2; idx++)
   {
     for(int jdx = 0; jdx < k + 1; jdx++)
       knapsack[idx][jdx] = 0;
   }
-
-  //memset(knapsack, 0, sizeof(int) * 2 * (k+1));
+*/
+  memset(knapsack, 0, sizeof(int) * 2 * (k+1));
 
   knapsack[0][0] = 1;
   knapsack[1][0] = 1;
