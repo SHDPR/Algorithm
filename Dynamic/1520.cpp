@@ -29,10 +29,6 @@ int search(int **mapping, int **route, int M, int N, int x, int y)
   return route[x][y];
 }
 
-
-
-
-
 int main()
 {
   int M, N;
