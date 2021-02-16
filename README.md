@@ -4,17 +4,17 @@ Each folders describe the type of the solved problem codes.
 
 * Backtracking
 * Basics
-> Basic arithmetics and C++ techniques
+  > Basic arithmetics and C++ techniques
 * BinarySearch
 * Bruteforce
 * DFS, BFS
-> Depth-first-search and Breadth-first-search
+  > Depth-first-search and Breadth-first-search
 * Dynamic
-> Dynamic programming
+  > Dynamic programming
 * Greedy
-> Greedy algorithm
+  > Greedy algorithm
 * Numbers
->  Number theory and Combinatorics
+  >  Number theory and Combinatorics
 * PriorityQueue
 * Queue
 * Recursion
