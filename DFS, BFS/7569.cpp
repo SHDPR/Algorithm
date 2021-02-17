@@ -11,7 +11,7 @@ int main(){
   cin >> M >> N >> H;
 
   int tomat[M][N][H];
-  int visit[M][N][N];
+  int visit[M][N][H];
 
   bool all_ripen = true;
 
