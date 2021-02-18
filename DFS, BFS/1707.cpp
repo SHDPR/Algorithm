@@ -60,8 +60,6 @@ int main()
           break;
       }
 
-
-
       int x = bfs.front();
       int check = visit[x];
 

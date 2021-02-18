@@ -23,5 +23,8 @@ Each folders describe the type of the solved problem codes.
 * PriorityQueue
 * Queue
 * Recursion
+* ShortestPath
+
+  > Shortest path problems with weight on line
 * Sort
 * Stack
