@@ -2,7 +2,6 @@
 #include <queue>
 #include <vector>
 #include <limits.h>
-#include <memory.h>
 
 using namespace std;
 typedef pair<int, int> dint;
