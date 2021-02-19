@@ -1,23 +1,19 @@
 #include <iostream>
 #include <queue>
 #include <vector>
+#include <limits.h>
 #include <memory.h>
 
 using namespace std;
 typedef pair<int, int> dint;
 
+/* compare function for dint member in priority queue */
 struct compare{
   bool operator()(dint a, dint b)
   {
-    if(a.second == -1)
-      return true;
-    else if(b.second == -1)
-      return false;
-    else
-      return a > b;
+    return a.second > b.second;
   }
 };
-
 
 int main()
 {
@@ -28,7 +24,7 @@ int main()
   cin >> start;
   start -= 1;
 
-  vector<dint> conn[V];
+  vector<dint> *conn = new vector<dint>[V];
   for(int idx = 0; idx < E; idx++)
   {
     int src, dest, dist;
@@ -36,12 +32,9 @@ int main()
     conn[src-1].push_back({dest-1, dist});
   }
 
-  bool visit[V];
-  memset(visit, 0, sizeof(visit));
-
-  int dist[V];
+  int *dist = new int[V];
   for(int idx = 0; idx < V; idx++)
-    dist[idx] = -1;
+    dist[idx] = INT_MAX;
 
   priority_queue<dint, vector<dint>, compare> dij;
 
@@ -56,11 +49,6 @@ int main()
     int cur_node = dij.top().first;
     dij.pop();
 
-    if(visit[cur_node] == 1)
-      continue;
-
-    visit[cur_node] = 1;
-
     int len = conn[cur_node].size();
     for(int idx = 0; idx < len; idx++)
     {
@@ -68,20 +56,18 @@ int main()
       int route_dist = next.second;
       int next_node = next.first;
 
-      if(visit[next_node] == 0)
+      if(route_dist + cur_dist < dist[next_node])
       {
-        if(dist[next_node] == -1 || route_dist + cur_dist < dist[next_node])
-        {
-          dist[next_node] = route_dist + cur_dist;
-          dij.push({next_node, dist[next_node]});
-        }
+        dist[next_node] = route_dist + cur_dist;
+        dij.push({next_node, dist[next_node]});
       }
     }
   }
 
+
   for(int idx = 0; idx < V; idx++)
   {
-    if(dist[idx] == -1)
+    if(dist[idx] == INT_MAX)
       cout << "INF\n";
     else
       cout << dist[idx] << "\n";
