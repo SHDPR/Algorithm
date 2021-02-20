@@ -35,6 +35,10 @@ int main()
   for(int idx = 0; idx < V; idx++)
     dist[idx] = INT_MAX;
 
+  int *visit = new int[V];
+  for(int idx = 0; idx < V; idx++)
+    visit[idx] = 0;
+
   priority_queue<dint, vector<dint>, compare> dij;
 
   dist[start] = 0;
@@ -48,12 +52,17 @@ int main()
     int cur_node = dij.top().first;
     dij.pop();
 
+    visit[cur_node] = 1;
+
     int len = conn[cur_node].size();
     for(int idx = 0; idx < len; idx++)
     {
       dint next = conn[cur_node][idx];
       int route_dist = next.second;
       int next_node = next.first;
+
+      if(visit[cur_node] == 0)
+        continue;
 
       if(route_dist + cur_dist < dist[next_node])
       {
