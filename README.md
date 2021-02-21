@@ -25,6 +25,6 @@ Each folders describe the type of the solved problem codes.
 * Recursion
 * ShortestPath
 
-  > Shortest path problems, mostly using Dijkstra algorithm
+  > Shortest path problems, using Dijkstra, Bellman-Ford algorithm
 * Sort
 * Stack
