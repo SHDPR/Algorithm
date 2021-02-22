@@ -1,69 +1,88 @@
 #include <iostream>
-#include <queue>
 #include <vector>
+#include <tuple>
 #include <limits.h>
 
 using namespace std;
-typedef pair<int, int> dint;
 
 
 int main()
 {
-  int N, M;
+  long long N, M;
+
   cin >> N >> M;
 
-  vector<dint> *conn = new vector<dint>[N];
-  for(int idx = 0; idx < M; idx++)
+  vector<tuple<long long, long long, long long>> edge;
+  for(long long idx = 0; idx < M; idx++)
   {
-    int src, dest, dist;
+    long long src, dest, dist;
     cin >> src >> dest >> dist;
-    conn[src-1].push_back({dest-1, dist});
+    edge.push_back(make_tuple(src-1, dest-1, dist));
   }
 
-  int *dist = new int[N];
-  dist[0] = 0;
-  for(int idx = 1; idx < N; idx++)
+  long long *dist = new long long[N];
+  for(long long idx = 1; idx < N; idx++)
     dist[idx] = INT_MAX;
+  dist[0] = 0;
 
-  for(int idx = 0; idx < N; idx++)
+  long long len = edge.size();
+  for(long long idx = 0; idx < N; idx++)
   {
-    int dist_here = dist[idx];
-    if(dist_here == INT_MAX)
-      continue;
-    int len = conn[idx].size();
-    for(int jdx = 0; jdx < len; jdx++)
+    for(long long jdx = 0; jdx < len; jdx++)
     {
-      int node_next = conn[idx][jdx].first;
-      if(dist[node_next] == INT_MAX || dist[node_next] > dist_here + conn[idx][jdx].second)
-        dist[node_next] = dist_here + conn[idx][jdx].second;
+      long long src = get<0>(edge[jdx]);
+      long long dest = get<1>(edge[jdx]);
+      long long w = get<2>(edge[jdx]);
+
+      if(dist[src] == INT_MAX)
+        continue;
+
+      if(dist[dest] > dist[src] + w)
+        dist[dest] = dist[src] + w;
     }
   }
 
-  int *dist_check = new int[N];
-  for(int idx = 0; idx < N; idx++)
-    dist_check[idx] = dist[idx];
+  long long *check = new long long[N];
 
-  for(int idx = 0; idx < 1; idx++)
+  for(long long idx = 0; idx < N; idx++)
+    check[idx] = dist[idx];
+
+  for(long long jdx = 0; jdx < len; jdx++)
   {
-    int dist_here = dist[idx];
-    if(dist_here == INT_MAX)
+    long long src = get<0>(edge[jdx]);
+    long long dest = get<1>(edge[jdx]);
+    long long w = get<2>(edge[jdx]);
+
+    if(dist[src] == INT_MAX)
       continue;
-    int len = conn[idx].size();
-    for(int jdx = 0; jdx < len; jdx++)
+
+    if(dist[dest] > dist[src] + w)
+      dist[dest] = dist[src] + w;
+  }
+
+  bool flag = true;
+  for(long long idx = 0; idx < N; idx++)
+  {
+    if(check[idx] != dist[idx])
     {
-      int node_next = conn[idx][jdx].first;
-      if(dist[node_next] == INT_MAX || dist[node_next] > dist_here + conn[idx][jdx].second)
-        dist[node_next] = dist_here + conn[idx][jdx].second;
+      flag = false;
+      break;
     }
   }
 
-  for(int idx = 1; idx < N; idx++)
+  if(flag)
   {
-    if(dist_check[idx] != dist[idx] || dist[idx] == INT_MAX)
-      cout << -1 << '\n';
-    else
-      cout << dist_check[idx] << '\n';
+    for(long long idx = 1; idx < N; idx++)
+    {
+      if(dist[idx] == INT_MAX)
+        cout << -1 << '\n';
+      else
+        cout << dist[idx] << '\n';
+    }
   }
+  else
+    cout << -1 <<'\n';
+
 
 
 }
