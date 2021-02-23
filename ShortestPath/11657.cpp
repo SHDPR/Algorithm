@@ -8,31 +8,31 @@ using namespace std;
 
 int main()
 {
-  long long N, M;
+  int N, M;
 
   cin >> N >> M;
 
-  vector<tuple<long long, long long, long long>> edge;
-  for(long long idx = 0; idx < M; idx++)
+  vector<tuple<int, int, int>> edge;
+  for(int idx = 0; idx < M; idx++)
   {
-    long long src, dest, dist;
+    int src, dest, dist;
     cin >> src >> dest >> dist;
     edge.push_back(make_tuple(src-1, dest-1, dist));
   }
 
-  long long *dist = new long long[N];
-  for(long long idx = 1; idx < N; idx++)
+  long *dist = new long[N];
+  for(int idx = 1; idx < N; idx++)
     dist[idx] = INT_MAX;
   dist[0] = 0;
 
-  long long len = edge.size();
-  for(long long idx = 0; idx < N; idx++)
+  int len = edge.size();
+  for(int idx = 0; idx < N; idx++)
   {
-    for(long long jdx = 0; jdx < len; jdx++)
+    for(int jdx = 0; jdx < len; jdx++)
     {
-      long long src = get<0>(edge[jdx]);
-      long long dest = get<1>(edge[jdx]);
-      long long w = get<2>(edge[jdx]);
+      int src = get<0>(edge[jdx]);
+      int dest = get<1>(edge[jdx]);
+      int w = get<2>(edge[jdx]);
 
       if(dist[src] == INT_MAX)
         continue;
@@ -42,16 +42,16 @@ int main()
     }
   }
 
-  long long *check = new long long[N];
+  long *check = new long[N];
 
-  for(long long idx = 0; idx < N; idx++)
+  for(int idx = 0; idx < N; idx++)
     check[idx] = dist[idx];
 
-  for(long long jdx = 0; jdx < len; jdx++)
+  for(int jdx = 0; jdx < len; jdx++)
   {
-    long long src = get<0>(edge[jdx]);
-    long long dest = get<1>(edge[jdx]);
-    long long w = get<2>(edge[jdx]);
+    int src = get<0>(edge[jdx]);
+    int dest = get<1>(edge[jdx]);
+    int w = get<2>(edge[jdx]);
 
     if(dist[src] == INT_MAX)
       continue;
@@ -61,7 +61,7 @@ int main()
   }
 
   bool flag = true;
-  for(long long idx = 0; idx < N; idx++)
+  for(int idx = 0; idx < N; idx++)
   {
     if(check[idx] != dist[idx])
     {
@@ -72,7 +72,7 @@ int main()
 
   if(flag)
   {
-    for(long long idx = 1; idx < N; idx++)
+    for(int idx = 1; idx < N; idx++)
     {
       if(dist[idx] == INT_MAX)
         cout << -1 << '\n';
@@ -82,7 +82,4 @@ int main()
   }
   else
     cout << -1 <<'\n';
-
-
-
 }
