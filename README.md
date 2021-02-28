@@ -16,6 +16,9 @@ Each folders describe the type of the solved problem codes.
   > Dynamic programming
 * Greedy
 
+* Dynamic+Record
+  > Combination of Dynamic programming and Shortest-path-record
+
   > Greedy algorithm
 * Numbers
 
