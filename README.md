@@ -17,7 +17,7 @@ Each folders describe the type of the solved problem codes.
 * Greedy
 
   > Greedy algorithm
-*GSAT
+* GSAT
 
   > Previous Samsung SW coding test problems
 * Dynamic+Record
