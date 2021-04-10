@@ -16,10 +16,13 @@ Each folders describe the type of the solved problem codes.
   > Dynamic programming
 * Greedy
 
-* Dynamic+Record
-  > Combination of Dynamic programming and Shortest-path-record
-
   > Greedy algorithm
+*GSAT
+
+  > Previous Samsung SW coding test problems
+* Dynamic+Record
+
+  > Combination of Dynamic programming and Shortest-path-record
 * Numbers
 
   >  Number theory and Combinatorics
