@@ -1,27 +1,26 @@
-#include <cstdio>
+#include <iostream>
 #include <algorithm>
 
 using namespace std;
 
-int main() {
+int main()
+{
+  int time[17] = {0,};
+  int pay[17] = {0,};
+  int max_val = 0;
+  int N;
 
-  int time[17] = { 0, };
-  int pay[17] = { 0, };
-  int n, i;
-  int ans = 0;
-
-  scanf("%d", &n);
-
-  for (i = 1; i <= n; i++) scanf("%d %d", &time[i], &pay[i]);
-
-  for (i = n; i >= 1; i--) {
-      if (i + time[i] > n + 1) pay[i] = pay[i+1];
-      else {
-      pay[i] = max(pay[i+1], pay[i] + pay[i+time[i]]);
-    }
+  cin >> N;
+  for(int idx = 1; idx <= N; idx++)
+  {
+    cin >> time[idx] >> pay[idx];
   }
-
-  printf("%d\n", pay[1]);
-
-  return 0;
+  for(int idx = N; idx >= 1; idx--)
+  {
+    if(idx + time[idx] > N + 1)
+      pay[idx] = pay[idx + 1];
+    else
+      pay[idx] = max(pay[idx + 1], pay[idx] + pay[idx + time[idx]]);
+  }
+    cout << pay[1];
 }
